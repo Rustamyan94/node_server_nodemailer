@@ -1,6 +1,7 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const path = require("path");
+const cors = require("cors");
 
 require("dotenv").config();
 
@@ -10,6 +11,7 @@ const PORT = 80; // 8080
 
 app.use(express.static(path.resolve("../client/build")));
 app.use(express.json());
+app.use(cors());
 
 let transporter = nodemailer.createTransport({
   service: "gmail",
