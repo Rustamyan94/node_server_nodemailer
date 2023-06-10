@@ -40,16 +40,15 @@ app.post("/sendMail", (req, res) => {
   } else if (req.body.type == "order") {
     mailOptions.html = `<div>
     <h3>Ваш заказ с сайта "rosgoststroy1.ru"</h3>
-    <p>${
-      req.body.color +
-      " " +
-      req.body.title +
-      " " +
-      req.body.size +
-      " " +
-      req.body.count
-    }  м2 с ценой ${req.body.price}₽</p>
-    <br>
+    ${req.body.shopItems
+      .map(
+        (item) =>
+          `<p>${
+            item.color + " " + item.title + " " + item.size + " " + item.count
+          }  м2 с ценой ${item.price}₽</p>`
+      )
+      .join("")}
+
     <h4>Контакты</h4>
     <p>Имя - ${req.body.name}</p>
     <p>Номер телефона - ${req.body.tel}</p>
