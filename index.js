@@ -1,10 +1,16 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
+const path = require("path");
+
 require("dotenv").config();
 
 const app = express();
-const port = 3000;
+
+const PORT = 80; // 8080
+
+app.use(express.static(path.resolve("../client/build")));
 app.use(express.json());
+
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -17,18 +23,16 @@ let transporter = nodemailer.createTransport({
   },
 });
 
-app.get("/", (req, res) => {
-  // res.send(process.env);
-  res.end();
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve("../client/build", "index.html"));
 });
 app.post("/sendMail", (req, res) => {
   let mailOptions = {
     from: process.env.GMAIL,
     to: process.env.GMAIL,
     subject: "Заявка с сайта 'rosgoststroy1.ru'",
-    // text: "Hi from your nodemailer project",
   };
-  console.log(req.body);
+
   if (req.body.type == "callBack") {
     mailOptions.text = `Клиент оставил номер телефона и просит чтобы вы звонили его - ${req.body.tel}`;
   } else if (req.body.type == "callBackForm") {
@@ -56,12 +60,15 @@ app.post("/sendMail", (req, res) => {
   transporter.sendMail(mailOptions, function (err, data) {
     if (err) {
       console.log("Error " + err);
+      res.send({ status: 500, message: "Error " + err });
     } else {
-      console.log("Email sent successfully", data);
+      // console.log("Email sent successfully", data);
+      res.send({ status: 200, message: "Email sent successfully", data });
     }
   });
   res.end();
 });
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`);
 });
